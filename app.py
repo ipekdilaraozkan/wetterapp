@@ -41,21 +41,20 @@ def wetterdaten_verarbeiten(standort, startdatum, enddatum):
 def wetterdaten_visualisieren(daten, startdatum, enddatum):
     st.subheader(f"Wetterdaten von {startdatum.date()} bis {enddatum.date()}")
     st.subheader(f"1) Durchschnittliche tägliche Temperatur in Aachen")
-    wetterdaten_anzeigen(daten, 'tavg', 'Temperatur (°C)', '')
+    wetterdaten_anzeigen(daten, 'tavg', 'Temperatur (°C)', 'blue')
     st.subheader(f"2) Täglicher Niederschlag in Aachen")
-    wetterdaten_anzeigen(daten, 'prcp', 'Niederschlag (mm)', '')
+    wetterdaten_anzeigen(daten, 'prcp', 'Niederschlag (mm)', 'green')
     st.subheader(f"3) Täglicher Schneefall in Aachen")
 
     if daten['snow'].sum() == 0:
         st.info("Kein Schneefall im ausgewählten Zeitraum aufgezeichnet.")
     else:
-        wetterdaten_anzeigen(daten, 'snow', 'Schneefall (mm)', '')
+        wetterdaten_anzeigen(daten, 'snow', 'Schneefall (mm)', 'purple')
 
 # Funktion zum Plotten der Wetterdaten (Temperatur, Regen, Schnee)
-def wetterdaten_anzeigen(daten, datentyp, y_beschriftung, titel):
+def wetterdaten_anzeigen(daten, datentyp, y_beschriftung, farbe):
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.plot(daten.index, daten[datentyp], marker='o')
-    ax.set_title(titel)
     ax.set_ylabel(y_beschriftung)
     ax.set_xlabel('Datum')
     ax.grid(True)
