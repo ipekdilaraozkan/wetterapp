@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from meteostat import Point, Daily
 import pandas as pd
 
-# Hauptfunktion zur Steuerung der App
+# Funktiom zur Steuerung der App
 def hauptprogramm():
     
     st.title("Historische Wetterdaten für Aachen")
@@ -17,7 +17,7 @@ def hauptprogramm():
     daten = wetterdaten_verarbeiten(standort, startdatum, enddatum)
     wetterdaten_visualisieren(daten, startdatum, enddatum)
 
-# Funktion zur Bestimmung des Start- und Enddatums basierend auf der Auswahl des Benutzers
+# Funktion zur Bestimmung des Start- und Enddatums basierend auf der Auswahl des Nutzers
 def zeitraum_bestimmen(option):
     perioden = {
         'Letzte Woche': 7,
