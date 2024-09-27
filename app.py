@@ -4,87 +4,64 @@ import matplotlib.pyplot as plt
 from meteostat import Point, Daily
 import pandas as pd
 
-# Streamlit app title
-st.title("Aachen Historical Weather Data")
+# Hauptfunktion zur Steuerung der App
+def hauptprogramm():
+    
+    st.title("Historische Wetterdaten für Aachen")
+    standort = Point(50.7753, 6.0839, 200)
+    option = st.selectbox(
+        "Wählen Sie einen Zeitraum für die historischen Wetterdaten:",
+        ['Letzte Woche', 'Letzter Monat', 'Letzte drei Monate', 'Letzte sechs Monate', 'Letztes Jahr']
+    )
+    startdatum, enddatum = zeitraum_bestimmen(option)
+    daten = wetterdaten_verarbeiten(standort, startdatum, enddatum)
+    wetterdaten_visualisieren(daten, startdatum, enddatum)
 
-# Function to get the start and end date based on user's choice
-def get_time_period(option):
-    today = datetime.today()
+# Funktion zur Bestimmung des Start- und Enddatums basierend auf der Auswahl des Benutzers
+def zeitraum_bestimmen(option):
+    perioden = {
+        'Letzte Woche': 7,
+        'Letzter Monat': 30,
+        'Letzte drei Monate': 90,
+        'Letzte sechs Monate': 180,
+        'Letztes Jahr': 365
+    }
+    heute = datetime.today()
+    startdatum = heute - timedelta(days=perioden[option])
+    return startdatum, heute
 
-    if option == 'Last Week':
-        start_date = today - timedelta(days=7)
-    elif option == 'Last Month':
-        start_date = today - timedelta(days=30)
-    elif option == 'Last Three Months':
-        start_date = today - timedelta(days=90)
-    elif option == 'Last Six Months':
-        start_date = today - timedelta(days=180)
-    elif option == 'Last Year':
-        start_date = today - timedelta(days=365)
+# Funktion zur Datenverarbeitung
+def wetterdaten_verarbeiten(standort, startdatum, enddatum):
+    daten = Daily(standort, start=startdatum, end=enddatum)
+    daten = daten.fetch()
+    daten.index = pd.to_datetime(daten.index)
+    return daten
+
+# Funktion zur Visualisierung der Wetterdaten
+def wetterdaten_visualisieren(daten, startdatum, enddatum):
+    st.subheader(f"Wetterdaten von {startdatum.date()} bis {enddatum.date()}")
+    st.subheader(f"Durchschnittliche tägliche Temperatur in Aachen")
+    wetterdaten_anzeigen(daten, 'tavg', 'Temperatur (°C)')
+    st.subheader(f"Täglicher Niederschlag in Aachen")
+    wetterdaten_anzeigen(daten, 'prcp', 'Niederschlag (mm))
+    st.subheader(f"Täglicher Schneefall in Aachen")
+
+    if daten['snow'].sum() == 0:
+        st.info("Kein Schneefall im ausgewählten Zeitraum aufgezeichnet.")
     else:
-        st.error("Invalid choice. Please select a valid option.")
-        return None, None
-    
-    return start_date, today
+        wetterdaten_anzeigen(daten, 'snow', 'Schneefall (mm))
 
-# Function to plot weather data (temperature, rain, snow)
-def plot_weather_data(data, plot_type):
+# Funktion zum Plotten der Wetterdaten (Temperatur, Regen, Schnee)
+def wetterdaten_anzeigen(daten, datentyp, y_beschriftung, titel):
     fig, ax = plt.subplots(figsize=(10, 5))
-    
-    if plot_type == 'Temperature':
-        ax.plot(data.index, data['tavg'], marker='o', color='b')
-        ax.set_title(f'Average Daily Temperature in Aachen')
-        ax.set_ylabel('Temperature (°C)')
-    elif plot_type == 'Rain':
-        ax.plot(data.index, data['prcp'], marker='o', color='g')
-        ax.set_title(f'Daily Rainfall in Aachen')
-        ax.set_ylabel('Rainfall (mm)')
-    elif plot_type == 'Snow':
-        ax.plot(data.index, data['snow'], marker='o', color='c')
-        ax.set_title(f'Daily Snowfall in Aachen')
-        ax.set_ylabel('Snowfall (mm)')
-    
-    ax.set_xlabel('Date')
+    ax.plot(daten.index, daten[datentyp], marker='o')
+    ax.set_title(titel)
+    ax.set_ylabel(y_beschriftung)
+    ax.set_xlabel('Datum')
     ax.grid(True)
     plt.xticks(rotation=45)
     st.pyplot(fig)
 
-# Fixed location (Aachen) for weather data
-location = Point(50.7753, 6.0839, 200)
-
-# Select a time period using Streamlit's selectbox
-option = st.selectbox(
-    "Select a time period for historical weather data:",
-    ['Last Week', 'Last Month', 'Last Three Months', 'Last Six Months', 'Last Year']
-)
-
-# Get the start and end dates based on user input
-start_date, end_date = get_time_period(option)
-
-if start_date and end_date:
-    # Fetch daily weather data
-    data = Daily(location, start=start_date, end=end_date)
-    data = data.fetch()
-
-    # Check if the data is empty or not
-    if data.empty:
-        st.warning("No data available for the selected period.")
-    else:
-        # Convert dates using pd.to_datetime if needed
-        data.index = pd.to_datetime(data.index)
-
-        # Plot temperature, rain, and snow data
-        st.subheader(f"Weather data from {start_date.date()} to {end_date.date()}")
-
-        # Plot temperature data
-        plot_weather_data(data, 'Temperature')
-
-        # Plot rain data
-        plot_weather_data(data, 'Rain')
-
-        # Check for snowfall data: if all values are 0, skip plotting
-        if data['snow'].sum() == 0:
-            st.info("No snowfall recorded during the selected period.")
-        else:
-            # Plot snow data if there is any snowfall
-            plot_weather_data(data, 'Snow')
+# Startpunkt der App
+if __name__ == "__main__":
+    hauptprogramm()
