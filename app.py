@@ -54,7 +54,7 @@ def wetterdaten_visualisieren(daten, startdatum, enddatum):
 # Funktion zum Plotten der Wetterdaten (Temperatur, Regen, Schnee)
 def wetterdaten_anzeigen(daten, datentyp, y_beschriftung, farbe):
     fig, ax = plt.subplots(figsize=(10, 5))
-    ax.plot(daten.index, daten[datentyp], marker='o')
+    ax.plot(dates, values, marker='o', color=farbe)
     ax.set_ylabel(y_beschriftung)
     ax.set_xlabel('Datum')
     ax.grid(True)
