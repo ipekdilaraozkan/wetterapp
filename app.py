@@ -43,13 +43,13 @@ def wetterdaten_visualisieren(daten, startdatum, enddatum):
     st.subheader(f"Durchschnittliche tägliche Temperatur in Aachen")
     wetterdaten_anzeigen(daten, 'tavg', 'Temperatur (°C)')
     st.subheader(f"Täglicher Niederschlag in Aachen")
-    wetterdaten_anzeigen(daten, 'prcp', 'Niederschlag (mm))
+    wetterdaten_anzeigen(daten, 'prcp', 'Niederschlag (mm)')
     st.subheader(f"Täglicher Schneefall in Aachen")
 
     if daten['snow'].sum() == 0:
         st.info("Kein Schneefall im ausgewählten Zeitraum aufgezeichnet.")
     else:
-        wetterdaten_anzeigen(daten, 'snow', 'Schneefall (mm))
+        wetterdaten_anzeigen(daten, 'snow', 'Schneefall (mm)')
 
 # Funktion zum Plotten der Wetterdaten (Temperatur, Regen, Schnee)
 def wetterdaten_anzeigen(daten, datentyp, y_beschriftung, titel):
